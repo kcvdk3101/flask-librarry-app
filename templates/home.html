@@ -7,7 +7,7 @@
     </div>
     <div class="col-span-4 md:col-span-3">
       <div class="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {% for card in cards %}
+        {% if cards %} {% for card in cards %}
         <div
           class="w-full cursor-pointer rounded-md shadow-md shadow-gray-200 hover:shadow-green-200/80 hover:scale-110 hover:shadow-2xl hover:bg-gray-50 transition-all"
         >
@@ -22,7 +22,9 @@
             </p>
           </div>
         </div>
-        {% endfor %}
+        {% endfor %} {% else %}
+        <p class="text-xl font-bold">No items to show.</p>
+        {% endif %}
       </div>
     </div>
   </div>
