@@ -1,2 +1,54 @@
 {% extends 'base.html' %} {% block title %} Item Detail {% endblock %} {% block
-content %} {% endblock%}
+content %}
+<div class="flex flex-col items-center justify-center mb-5">
+  <div class="w-1/2 flex justify-between items-center">
+    <h1 class="text-2xl font-bold my-5">Item Detail</h1>
+    <div class="flex items-center">
+      <form
+        method="POST"
+        action="{{ url_for('delete_item', item_id=item.id) }}"
+        class="mr-2"
+      >
+        {{ deleteItemForm.hidden_tag() }} {{
+        deleteItemForm.submit(class="bg-red-400 text-white hover:bg-red-500 py-2
+        px-4 rounded inline-flex items-center", onclick="return confirm('Are you
+        sure to delete this item?');")}}
+      </form>
+      <form
+        method="POST"
+        action="{{ url_for('delete_item', item_id=item.id) }}"
+      >
+        <button
+          class="bg-blue-400 text-white hover:bg-blue-500 py-2 px-4 rounded inline-flex items-center"
+        >
+          <span>Update</span>
+        </button>
+      </form>
+    </div>
+  </div>
+  <div
+    class="w-1/2 cursor-pointer rounded-md shadow-md shadow-gray-200 hover:bg-gray-50 transition-all"
+  >
+    <img
+      class="aspect-video bg-cover w-full rounded-t-md"
+      src="{{ url_for('static', filename='images/banner_logo.png') }}"
+    />
+    <div class="p-4">
+      <p class="font-semibold text-xl py-2">{{ item.title }}</p>
+      <p class="text-lg py-2">{{ "$%.2f"|format(item.price) }}</p>
+      <p class="font-light text-gray-700 text-justify line-clamp-3">
+        {{item.description}}
+      </p>
+    </div>
+    <div class="p-3">
+      <p class="inline-block bg-gray-200 text-base py-2 px-4 my-2 rounded">
+        {{ item.category }}
+      </p>
+      <p class="inline-block bg-gray-200 text-base py-2 px-4 my-2 rounded">
+        {{ item.subcategory }}
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

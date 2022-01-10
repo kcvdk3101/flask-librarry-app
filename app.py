@@ -23,6 +23,13 @@ class NewItemForm(FlaskForm):
   subcategory = SelectField("Subcategory")
   submit = SubmitField("Submit")
 
+class DeleteItemForm(FlaskForm):
+  submit = SubmitField("Delete")
+
+class EditItemForm(NewItemForm):
+  submit = SubmitField("Update item")
+
+
 
 @app.route("/")
 def home():
@@ -55,6 +62,7 @@ def home():
 
 
 # CRUD
+## Create
 @app.route('/item/new', methods=["GET", "POST"])
 def new_item():
   con = get_db()
@@ -97,17 +105,17 @@ def new_item():
   
   return render_template('new_item.html', form=form)
 
+## Read
 @app.route("/item/<int:item_id>")
 def item(item_id):
     c = get_db().cursor()
-    item_from_db = c.execute("""SELECT
-                   i.id, i.title, i.description, i.price, i.image, c.name, s.name
-                   FROM
-                   items AS i
-                   INNER JOIN categories AS c ON i.category_id = c.id
-                   INNER JOIN subcategories AS s ON i.subcategory_id = s.id
-                   WHERE i.id = ?""",
-                   (item_id,)
+    c.execute("""SELECT
+                i.id, i.title, i.description, i.price, i.image, c.name, s.name
+                FROM
+                items AS i
+                INNER JOIN categories AS c ON i.category_id = c.id
+                INNER JOIN subcategories AS s ON i.subcategory_id = s.id
+                WHERE i.id = {}""".format(item_id),
     )
     row = c.fetchone()
 
@@ -123,9 +131,43 @@ def item(item_id):
         }
     except:
         item = {}
-        return render_template("item.html", item=item)
+        
+    if item:
+      deleteItemForm = DeleteItemForm()
+
+      return render_template("item.html", item=item, deleteItemForm=deleteItemForm)
+
     return redirect(url_for("home"))
 
+## Update
+
+## Delete
+@app.route('/item/<int:item_id>/delete', methods=["POST"])
+def delete_item(item_id):
+  con = get_db()
+  c = con.cursor()
+
+  c.execute("SELECT * FROM items WHERE id = ?", (item_id,))
+  row = c.fetchone()
+
+  try:
+      item = {
+          "id": row[0],
+          "title": row[1]
+      }
+  except:
+      item = {}
+
+  if item:
+      c.execute("DELETE FROM items WHERE id = ?", (item_id,))
+      con.commit()
+
+      flash("Item {} has been successfully deleted.".format(item["title"]), "green")
+
+  else:
+      flash("This item does not exist.", "red")
+
+  return redirect(url_for("home"))
 
 # Connect to Database
 def get_db():
